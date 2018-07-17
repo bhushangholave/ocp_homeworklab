@@ -57,6 +57,8 @@
 
 	nodejs-mongo-persistent   nodejs-mongo-persistent-project-testapp.apps.e5d7.example.opentlc.com             nodejs-mongo-persistent   <all>                   None
 
+	m. Application running on http://nodejs-mongo-persistent-project-testapp.apps.e5d7.example.opentlc.com/
+
 ****************************************************************************************************************************************************
 2.2. Environment Configuration
 ****************************************************************************************************************************************************
