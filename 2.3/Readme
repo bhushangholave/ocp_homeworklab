@@ -1,0 +1,67 @@
+****************************************************************************************************************************************************
+2.3. CICD Workflow
+****************************************************************************************************************************************************
+	a. Referred github repo for CICD demo
+
+	https://github.com/OpenShiftDemos/openshift-cd-demo
+
+	b. provisioned jenkins,gogs,nexus and sonarqube using the script provision.sh
+
+	c. NAME        HOST/PORT                                             PATH      SERVICES    PORT       TERMINATION     WILDCARD
+	che         che-cicd-admin1.apps.e5d7.example.opentlc.com                   che-host    <all>                      None
+	gogs        gogs-cicd-admin1.apps.e5d7.example.opentlc.com                  gogs        <all>                      None
+	jenkins     jenkins-cicd-admin1.apps.e5d7.example.opentlc.com               jenkins     <all>      edge/Redirect   None
+	nexus       nexus-cicd-admin1.apps.e5d7.example.opentlc.com                 nexus       8081-tcp                   None
+	sonarqube   sonarqube-cicd-admin1.apps.e5d7.example.opentlc.com             sonarqube   <all>                      None
+
+	d. 
+
+
+	    A Jenkins pipeline is pre-configured which clones Tasks application source code from Gogs (running on OpenShift), builds, deploys and promotes the result through the deployment pipeline. In the CI/CD project, click on Builds and then Pipelines to see the list of defined pipelines.
+
+	    Click on tasks-pipeline and Configuration and explore the pipeline definition.
+
+	    You can also explore the pipeline job in Jenkins by clicking on the Jenkins route url, logging in with the OpenShift credentials and clicking on tasks-pipeline and Configure.
+
+	    Run an instance of the pipeline by starting the tasks-pipeline in OpenShift or Jenkins.
+
+	    During pipeline execution, verify a new Jenkins slave pod is created within CI/CD project to execute the pipeline.
+
+	    Pipelines pauses at Deploy STAGE for approval in order to promote the build to the STAGE environment. Click on this step on the pipeline and then Promote.
+
+	    After pipeline completion, demonstrate the following:
+
+	    Explore the snapshots repository in Nexus and verify openshift-tasks is pushed to the repository
+	    Explore SonarQube and show the metrics, stats, code coverage, etc
+	    Explore Tasks - Dev project in OpenShift console and verify the application is deployed in the DEV environment
+	    Explore Tasks - Stage project in OpenShift console and verify the application is deployed in the STAGE environment
+
+	e. Dev environment is up and running 
+
+	[root@bastion ~]# oc get route -n dev-admin1 
+
+	NAME      HOST/PORT                                        PATH      SERVICES   PORT       TERMINATION   WILDCARD
+
+	tasks     tasks-dev-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
+
+	f. Stage environment is up and running
+
+	[root@bastion ~]# oc get route -n stage-admin1 
+
+	NAME      HOST/PORT                                          PATH      SERVICES   PORT       TERMINATION   WILDCARD
+
+	tasks     tasks-stage-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
+
+	g. Git clone eap-7 branch of OpenShiftDemos/openshift-tasks.git by forking it in my account.
+
+	Commit my change and pushed it into forked repo and sent pull request with my repo https://github.com/bhushangholave/openshift-tasks.git
+
+	h. Observed change in jenkins pipeline with error for unit test then made changes again and unit test passed.
+              
+              Jenkins pod is running with a persistent 
+		
+              Jenkins deploys openshift-tasks app
+
+	      Jenkins OpenShift plugin is used to create a CICD workflow
+
+	      HPA is configured and working on production deployment of openshift-tasks

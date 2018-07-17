@@ -1,0 +1,340 @@
+
+****************************************************************************************************************************************************
+2.4 Multitenancy
+****************************************************************************************************************************************************
+
+	a. Create 3 new projects with names alphacorp,betacorp,common
+	oc get projects
+	NAME                                DISPLAY NAME          STATUS
+
+	alphacorp                           client- alpha         Active
+
+	betacorp                            client- beta          Active
+
+	cicd-admin1                         CI/CD                 Active
+
+	common                              client- unspecified   Active
+
+	default                                                   Active
+
+	b. [root@bastion ~]# oc adm groups new alpha amy andrew
+
+	c. [root@bastion ~]# oc adm groups new beta brian betty
+	
+	d. [root@bastion ~]# oc label group/alpha client=alpha
+
+ 	   group "alpha" labeled
+
+	e. [root@bastion ~]# oc label group/beta client=beta
+	
+	  group "beta" labeled
+	
+	f. adding content to project 
+		oc new-app openshift/hello-openshift:v1.1.1.1 -n alphacorp
+	
+	g. adding content to project 
+		oc new-app openshift/hello-openshift:v1.1.1.1 -n betacorp 
+	
+	h. Pods running for both apps
+		[root@bastion ~]# oc get pod --all-namespaces | grep hello-openshift
+		alphacorp                           hello-openshift-1-s46r4                   1/1       Running     0          4m
+
+		betacorp                            hello-openshift-1-pcm9z                   1/1       Running     0          3m
+	
+	i. each client pods are running on dedicated nodes
+
+		[root@bastion ~]# oc describe pod  -n alphacorp hello-openshift-1-s46r4 | egrep 'IP|Node:'
+
+		Node:           node3.e5d7.internal/192.199.0.237
+
+		IP:             10.129.2.29
+	
+		[root@bastion ~]# oc describe pod  -n betacorp hello-openshift-1-pcm9z | egrep 'IP|Node:'
+
+		Node:           node4.e5d7.internal/192.199.0.58
+
+		IP:             10.128.4.24
+	
+	j. each node labeled for specific client
+		
+		[root@bastion ~]# oc label node node4.e5d7.internal client=beta
+	
+		node "node4.e5d7.internal" labeled
+
+		[root@bastion ~]# oc label node node3.e5d7.internal client=alpha
+
+		node "node3.e5d7.internal" labeled
+
+	k. change project request limit per label
+		ssh master1.$GUID.internal
+		sudo -i
+		
+		vim /etc/origin/master/master-config.yaml
+
+	   insert following lines
+
+		admissionConfig:
+
+		  pluginConfig:
+
+		    ProjectRequestLimit:
+
+		      configuration:
+
+			apiVersion: v1
+
+			kind: ProjectRequestLimitConfig
+
+			limits:
+
+			- selector:
+
+				client: alpha
+
+			  maxProjects: 5
+
+			- selector:
+				client: beta
+
+			  maxProjects: 5
+	   
+	    systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
+
+	l. setting project wide node selector for alphacorp and betacorp using patch command
+
+		[root@bastion ~]# oc patch namespace alphacorp -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=alpha"}}}'
+
+		[root@bastion ~]# oc patch namespace betacorp -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=beta"}}}'
+	M. limit are set using template 
+
+		echo '{
+	
+		    "kind": "LimitRange",
+
+		    "apiVersion": "v1",
+
+		    "metadata": {
+
+			"name": "limits",
+
+			"creationTimestamp": null
+
+		    },
+
+		    "spec": {
+
+			"limits": [
+
+			    {
+
+				"type": "Pod",
+
+				"max": {
+
+				    "cpu": "100m",
+
+				    "memory": "750Mi"
+
+				},
+
+				"min": {
+
+				    "cpu": "10m",
+
+				    "memory": "5Mi"
+
+				}
+
+			    },
+
+			    {
+				
+				"type": "Container",
+
+				"max": {
+
+				    "cpu": "100m",
+
+				    "memory": "750Mi"
+
+				},
+				"min": {
+
+				    "cpu": "10m",
+
+				    "memory": "5Mi"
+
+				},
+
+				"default": {
+
+				    "cpu": "50m",
+
+				    "memory": "100Mi"
+
+				}
+			    }
+			]
+		    }
+
+		}' | oc create -f -
+	modify using template
+		The new user template is used to create a user object with the specific label value
+	
+	Modify the master-config.yaml file to reference the loaded template:...
+
+		projectConfig:
+
+		 projectRequestTemplate: "default/project-request"
+
+		 ...
+	
+	N. New Client documentation
+		i. new project created for new client say myproject then while creating project we will slect a node
+			
+		[root@bastion ~]# oc adm new-project myproject \
+					--node-selector='client=myproject'
+		
+
+		ii. Add new group with users for client 
+
+		 oc adm groups new myproject xyz 
+	
+		iii. Add label fro group with name
+
+		oc label group/myproject client=myproject
+	
+		iv. Add lable to node for new client
+
+		[root@bastion ~]# oc label node node1.e5d7.internal client=myproject
+
+		v. Change project request limit per client
+
+		vim /etc/origin/master/master-config.yaml
+
+		systemctl restart atomic-openshift-master-api atomic-openshift-master-controllers
+
+		vi. Join the project myproject with other project for multitenency
+	
+		vii. can create user with label 
+
+			For example, if the user name is theuser and the label is level=gold:$ oc label myproject/theuser client=myproject
+	o. oc get pod -n alphacorp $(oc get pod -n alphacorp | grep hello-openshift | awk '{print $1}') -o template --template '{{.status.podIP}}{{"\n"}}'
+	
+		10.129.2.29
+	
+	p. oc get pod -n betacorp $(oc get pod -n betacorp | grep hello-openshift | awk '{print $1}') -o template --template '{{.status.podIP}}{{"\n"}}'
+		
+		10.128.4.24
+
+	q.  oc rsh -n betacorp $(oc get pod -n betacorp | grep shelly | awk '{print $1}')
+		
+		sh-4.2$ curl 10.129.2.29:8080 -m 1
+
+		curl: (28) Connection timed out after 1001 milliseconds
+
+		sh-4.2$ 
+
+		sh-4.2$ curl 10.128.4.24:8080 -m 1
+
+		Hello OpenShift!
+
+	    oc rsh -n alphacorp $(oc get pod -n alphacorp | grep shelly | awk '{print $1}')
+	
+		sh-4.2$ curl 10.129.2.29:8080 -m 1
+
+		Hello OpenShift!
+
+		sh-4.2$ curl 10.128.4.24:8080 -m 1
+
+		curl: (28) Connection timed out after 1000 milliseconds
+		sh-4.2$ 
+
+	r. Join projects
+
+		[root@bastion ~]# oc adm pod-network join-projects --to=betacorp alphacorp
+		
+		[root@bastion ~]# oc get netnamespaces | grep corp
+
+			alphacorp                           1877315    []
+
+			betacorp                            1877315    []
+		
+		oc rsh -n betacorp $(oc get pod -n betacorp | grep shelly | awk '{print $1}')
+		
+		[root@bastion ~]# oc rsh -n betacorp $(oc get pod -n betacorp | grep shelly | awk '{print $1}')
+
+		sh-4.2$ curl 10.129.2.29:8080 -m 1
+
+		Hello OpenShift!
+
+		sh-4.2$ curl 10.128.4.24:8080 -m 1
+
+		Hello OpenShift!
+
+		sh-4.2$ 
+	
+	[root@bastion ~]# oc describe service hello-openshift
+
+			Name:              hello-openshift
+
+			Namespace:         alphacorp
+
+			Labels:            app=hello-openshift
+
+			Annotations:       openshift.io/generated-by=OpenShiftNewApp
+
+			Selector:          app=hello-openshift,deploymentconfig=hello-openshift
+
+			Type:              ClusterIP
+
+			IP:                172.30.75.251
+
+			Port:              8080-tcp  8080/TCP
+
+			TargetPort:        8080/TCP
+
+			Endpoints:         10.129.2.29:8080
+
+			Port:              8888-tcp  8888/TCP
+
+			TargetPort:        8888/TCP
+
+			Endpoints:         10.129.2.29:8888
+
+			Session Affinity:  None
+
+			Events:            <none>
+	
+	session Affinity change to client ip
+		Name:              hello-openshift
+		Namespace:         servicelayer
+
+		Labels:            app=hello-openshift
+
+		Annotations:       openshift.io/generated-by=OpenShiftNewApp
+
+		Selector:          app=hello-openshift,deploymentconfig=hello-openshift
+
+		Type:              ClusterIP
+
+		IP:                172.30.162.40
+
+		Port:              8080-tcp  8080/TCP
+
+		TargetPort:        8080/TCP
+
+		Endpoints:         10.1.10.10:8080,10.1.4.11:8080,10.1.8.14:8080 + 1 more...
+
+		Port:              8888-tcp  8888/TCP
+
+		TargetPort:        8888/TCP
+
+		Endpoints:         10.1.10.10:8888,10.1.4.11:8888,10.1.8.14:8888 + 1 more...
+
+		Session Affinity:  ClientIP
+
+		Events:            <none>
+
+	
+		
