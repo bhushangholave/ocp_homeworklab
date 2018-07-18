@@ -1,18 +1,22 @@
+************************************************************************************************************************************************************************************************************
+*****************************************************Openshift 3.9 Homework Lab Assignment******************************************************************************************************************
+************************************************************************************************************************************************************************************************************
 
-*******************Homework Lab ***************************
-- Lab created for homework:- OTLC-LAB-bgholave-whitehedge.com-PROD_OCP_HA_HOMEWORK_LAB-e5d7
-- Started assignment:-
-- git repository used for this : https://github.com/bhushangholave/ocp_homeworklab
-- Folders 2.1,2.2 contains inventory hosts file and 2.3 contains snapshots of cicd workflow 
-- 
+	- Lab created for homework:- OTLC-LAB-bgholave-whitehedge.com-PROD_OCP_HA_HOMEWORK_LAB-e5d7
+	- Started assignment:-
+	- git repository used for this : https://github.com/bhushangholave/ocp_homeworklab
+	- Folders 2.1,2.2 contains inventory hosts file and 2.3 contains snapshots of cicd workflow 
+	- Folder 2.4 contains only readme file for 2.4 section of the assignment
+
+********************************************************************************************************************************************************
 
 ****************************************************************************************************************************************************
-2.1. Basic and HA Requirements- folder name "2.1"
+**********************************2.1. Basic and HA Requirements- folder name "2.1"*****************************************************************
 *****************************************************************************************************************************************************
 
 	a. clone https://github.com/bhushangholave/ocp_homeworklab.git
 
-	b. Look into host.nfs file for first point in assignment- inventory file with default network policy-subnet
+	b. Look into 2.1/host.nfs file for first point in assignment- inventory file with default network policy
 
 	c. https://loadbalancer1.e5d7.example.opentlc.com/console/ 
 	   Web console is reachable and can login with
@@ -60,10 +64,11 @@
 	m. Application running on http://nodejs-mongo-persistent-project-testapp.apps.e5d7.example.opentlc.com/
 
 ****************************************************************************************************************************************************
-2.2. Environment Configuration
+**********************************2.2. Environment Configuration************************************************************************************
 ****************************************************************************************************************************************************
 
 	a. chaged os_sdn_network_plugin_name='redhat/openshift-ovs-multitenant' in inventory file
+	   look into 2.2/host.nfs file for change in inventory file for multitenancy
 
 	b. Run separate ansible commands to change the plug-in and restart the services
 	 	following are the commands executed
@@ -112,65 +117,67 @@
 		
 	e. Router and Registry Pods run on Infranodes
 
-	NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
-	default                             docker-registry-1-nrzpx                   1/1       Running     0          3h        10.129.0.3      infranode1.e5d7.internal
+		NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
+		default                             docker-registry-1-nrzpx                   1/1       Running     0          3h        10.129.0.3      infranode1.e5d7.internal
 
-	default                             registry-console-1-mxmdh                  1/1       Running     0          3h        10.129.0.4      infranode1.e5d7.internal
+		default                             registry-console-1-mxmdh                  1/1       Running     0          3h        10.129.0.4      infranode1.e5d7.internal
 
-	default                             router-1-5lp24                            1/1       Running     0          3h        192.199.0.204   infranode2.e5d7.internal
+		default                             router-1-5lp24                            1/1       Running     0          3h        192.199.0.204   infranode2.e5d7.internal
 
-	default                             router-1-dw54n                            1/1       Running     0          3h        192.199.0.114   infranode1.e5d7.internal
+		default                             router-1-dw54n                            1/1       Running     0          3h        192.199.0.114   infranode1.e5d7.internal
 
 	f. Metrics and Logging components run on Infranodes
 
-	NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
+		NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
 
-	logging                             logging-curator-1-pr58d                   1/1       Running     0          3h        10.130.0.9      infranode2.e5d7.internal
+		logging                             logging-curator-1-pr58d                   1/1       Running     0          3h        10.130.0.9      infranode2.e5d7.internal
 
-	logging                             logging-es-data-master-8ts36w2o-1-wsmvd   2/2       Running     0          3h        10.130.0.12     infranode2.e5d7.internal
+		logging                             logging-es-data-master-8ts36w2o-1-wsmvd   2/2       Running     0          3h        10.130.0.12     infranode2.e5d7.internal
 
-	logging                             logging-fluentd-2knbn                     1/1       Running     0          3h        10.129.0.7      infranode1.e5d7.internal
+		logging                             logging-fluentd-2knbn                     1/1       Running     0          3h        10.129.0.7      infranode1.e5d7.internal
 
-	logging                             logging-fluentd-btwlv                     1/1       Running     0          3h        10.130.0.10     infranode2.e5d7.internal
+		logging                             logging-fluentd-btwlv                     1/1       Running     0          3h        10.130.0.10     infranode2.e5d7.internal
 
-	logging                             logging-kibana-1-jfhlg                    2/2       Running     0          3h        10.130.0.7      infranode2.e5d7.internal
+		logging                             logging-kibana-1-jfhlg                    2/2       Running     0          3h        10.130.0.7      infranode2.e5d7.internal
 
-	openshift-metrics                   prometheus-0                              6/6       Running     0          3h        10.129.0.8      infranode1.e5d7.internal
+		openshift-metrics                   prometheus-0                              6/6       Running     0          3h        10.129.0.8      infranode1.e5d7.internal
 
-	openshift-metrics                   prometheus-node-exporter-95tvf            1/1       Running     0          3h        192.199.0.114   infranode1.e5d7.internal
+		openshift-metrics                   prometheus-node-exporter-95tvf            1/1       Running     0          3h        192.199.0.114   infranode1.e5d7.internal
 
-	openshift-metrics                   prometheus-node-exporter-z4v9g            1/1       Running     0          3h        192.199.0.204   infranode2.e5d7.internal
+		openshift-metrics                   prometheus-node-exporter-z4v9g            1/1       Running     0          3h        192.199.0.204   infranode2.e5d7.internal
 
 	g. Service Catalog, Template Service Broker, and Ansible Service Broker are all working
 
 	Service Catalog
 
-	NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
+		NAMESPACE                           NAME                                      READY     STATUS      RESTARTS   AGE       IP              NODE
 
-	kube-service-catalog                apiserver-dgb2s                           1/1       Running     0          2h        10.130.2.31     master3.e5d7.internal
+		kube-service-catalog                apiserver-dgb2s                           1/1       Running     0          2h        10.130.2.31     master3.e5d7.internal
 
-	kube-service-catalog                apiserver-fz9bg                           1/1       Running     0          2h        10.131.0.4      master2.e5d7.internal
+		kube-service-catalog                apiserver-fz9bg                           1/1       Running     0          2h        10.131.0.4      master2.e5d7.internal
 
-	kube-service-catalog                apiserver-wrbbs                           1/1       Running     0          2h        10.128.0.7      master1.e5d7.internal
+		kube-service-catalog                apiserver-wrbbs                           1/1       Running     0          2h        10.128.0.7      master1.e5d7.internal
 
-	kube-service-catalog                controller-manager-bmvwt                  1/1       Running     0          2h        10.130.2.32     master3.e5d7.internal
+		kube-service-catalog                controller-manager-bmvwt                  1/1       Running     0          2h        10.130.2.32     master3.e5d7.internal
 
-	kube-service-catalog                controller-manager-bpcpm                  1/1       Running     3          2h        10.128.0.8      master1.e5d7.internal
+		kube-service-catalog                controller-manager-bpcpm                  1/1       Running     3          2h        10.128.0.8      master1.e5d7.internal
 
-	kube-service-catalog                controller-manager-d5558                  1/1       Running     0          2h        10.131.0.5      master2.e5d7.internal
+		kube-service-catalog                controller-manager-d5558                  1/1       Running     0          2h        10.131.0.5      master2.e5d7.internal
 
 	Template Service Broker and Ansible Service Broker
 
-	openshift-ansible-service-broker    asb-1-qdts2                               1/1       Running     0          2h        10.128.2.3      node1.e5d7.internal
+		openshift-ansible-service-broker    asb-1-qdts2                               1/1       Running     0          2h        10.128.2.3      node1.e5d7.internal
 
-	openshift-ansible-service-broker    asb-etcd-1-bvkw6                          1/1       Running     0          2h        10.128.4.3      node4.e5d7.internal
+		openshift-ansible-service-broker    asb-etcd-1-bvkw6                          1/1       Running     0          2h        10.128.4.3      node4.e5d7.internal
 
-	openshift-template-service-broker   apiserver-64xdz                           1/1       Running     0          2h        10.130.0.13     infranode2.e5d7.internal
+		openshift-template-service-broker   apiserver-64xdz                           1/1       Running     0          2h        10.130.0.13     infranode2.e5d7.internal
 
-	openshift-template-service-broker   apiserver-rk6pv                           1/1       Running     0          2h        10.129.0.9      infranode1.e5d7.internal
+		openshift-template-service-broker   apiserver-rk6pv                           1/1       Running     0          2h        10.129.0.9      infranode1.e5d7.internal
+	
+	
 
 ****************************************************************************************************************************************************
-2.3. CICD Workflow
+**********************************2.3. CICD Workflow************************************************************************************************
 ****************************************************************************************************************************************************
 	a. Referred github repo for CICD demo
 
@@ -178,17 +185,19 @@
 
 	b. provisioned jenkins,gogs,nexus and sonarqube using the script provision.sh
 
-	c. NAME        HOST/PORT                                             PATH      SERVICES    PORT       TERMINATION     WILDCARD
-	che         che-cicd-admin1.apps.e5d7.example.opentlc.com                   che-host    <all>                      None
-	gogs        gogs-cicd-admin1.apps.e5d7.example.opentlc.com                  gogs        <all>                      None
-	jenkins     jenkins-cicd-admin1.apps.e5d7.example.opentlc.com               jenkins     <all>      edge/Redirect   None
-	nexus       nexus-cicd-admin1.apps.e5d7.example.opentlc.com                 nexus       8081-tcp                   None
-	sonarqube   sonarqube-cicd-admin1.apps.e5d7.example.opentlc.com             sonarqube   <all>                      None
+	c. Pods deployed after successful completion
+
+		NAME        HOST/PORT                                             PATH      SERVICES    PORT       TERMINATION     WILDCARD
+		che         che-cicd-admin1.apps.e5d7.example.opentlc.com                   che-host    <all>                      None
+		gogs        gogs-cicd-admin1.apps.e5d7.example.opentlc.com                  gogs        <all>                      None
+		jenkins     jenkins-cicd-admin1.apps.e5d7.example.opentlc.com               jenkins     <all>      edge/Redirect   None
+		nexus       nexus-cicd-admin1.apps.e5d7.example.opentlc.com                 nexus       8081-tcp                   None
+		sonarqube   sonarqube-cicd-admin1.apps.e5d7.example.opentlc.com             sonarqube   <all>                      None
 
 	d. 
 
 
-	    A Jenkins pipeline is pre-configured which clones Tasks application source code from Gogs (running on OpenShift), builds, deploys and promotes the result through the deployment pipeline. In the CI/CD project, click on Builds and then Pipelines to see the list of defined pipelines.
+	    A Jenkins pipeline is pre-configured which clones Tasks application source code from Gogs (running on OpenShift), builds, deploys and promotes the result through the deployment pipeline. In 		    the CI/CD project, click on Builds and then Pipelines to see the list of defined pipelines.
 
 	    Click on tasks-pipeline and Configuration and explore the pipeline definition.
 
@@ -209,19 +218,19 @@
 
 	e. Dev environment is up and running 
 
-	[root@bastion ~]# oc get route -n dev-admin1 
+		[root@bastion ~]# oc get route -n dev-admin1 
 
-	NAME      HOST/PORT                                        PATH      SERVICES   PORT       TERMINATION   WILDCARD
+		NAME      HOST/PORT                                        PATH      SERVICES   PORT       TERMINATION   WILDCARD
 
-	tasks     tasks-dev-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
+		tasks     tasks-dev-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
 
 	f. Stage environment is up and running
 
-	[root@bastion ~]# oc get route -n stage-admin1 
+		[root@bastion ~]# oc get route -n stage-admin1 
 
-	NAME      HOST/PORT                                          PATH      SERVICES   PORT       TERMINATION   WILDCARD
+		NAME      HOST/PORT                                          PATH      SERVICES   PORT       TERMINATION   WILDCARD
 
-	tasks     tasks-stage-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
+		tasks     tasks-stage-admin1.apps.e5d7.example.opentlc.com             tasks      8080-tcp                 None
 
 	g. Git clone eap-7 branch of OpenShiftDemos/openshift-tasks.git by forking it in my account.
 
@@ -236,24 +245,26 @@
 	      Jenkins OpenShift plugin is used to create a CICD workflow
 
 	      HPA is configured and working on production deployment of openshift-tasks
+	
+	i. git repository folder 2.3/ contains screenshots of the applications running for this assignment
 
 ****************************************************************************************************************************************************
-2.4 Multitenancy
+**********************************2.4 Multitenancy**************************************************************************************************
 ****************************************************************************************************************************************************
 
 	a. Create 3 new projects with names alphacorp,betacorp,common
-	oc get projects
-	NAME                                DISPLAY NAME          STATUS
+		oc get projects
+		NAME                                DISPLAY NAME          STATUS
 
-	alphacorp                           client- alpha         Active
+		alphacorp                           client- alpha         Active
 
-	betacorp                            client- beta          Active
+		betacorp                            client- beta          Active
 
-	cicd-admin1                         CI/CD                 Active
+		cicd-admin1                         CI/CD                 Active
 
-	common                              client- unspecified   Active
+		common                              client- unspecified   Active
 
-	default                                                   Active
+		default                                                   Active
 
 	b. [root@bastion ~]# oc adm groups new alpha amy andrew
 
@@ -427,6 +438,10 @@
 
 		 ...
 	
+	[root@bastion ~]# oc get limits
+	NAME      AGE
+	limits    19s
+
 	N. New Client documentation
 		i. new project created for new client say myproject then while creating project we will slect a node
 			
@@ -545,36 +560,36 @@
 			Events:            <none>
 	
 	session Affinity change to client ip
-		Name:              hello-openshift
-		Namespace:         servicelayer
+			Name:              hello-openshift
+			Namespace:         servicelayer
 
-		Labels:            app=hello-openshift
+			Labels:            app=hello-openshift
 
-		Annotations:       openshift.io/generated-by=OpenShiftNewApp
+			Annotations:       openshift.io/generated-by=OpenShiftNewApp
 
-		Selector:          app=hello-openshift,deploymentconfig=hello-openshift
+			Selector:          app=hello-openshift,deploymentconfig=hello-openshift
 
-		Type:              ClusterIP
+			Type:              ClusterIP
 
-		IP:                172.30.162.40
+			IP:                172.30.162.40
 
-		Port:              8080-tcp  8080/TCP
+			Port:              8080-tcp  8080/TCP
 
-		TargetPort:        8080/TCP
+			TargetPort:        8080/TCP
 
-		Endpoints:         10.1.10.10:8080,10.1.4.11:8080,10.1.8.14:8080 + 1 more...
+			Endpoints:         10.1.10.10:8080,10.1.4.11:8080,10.1.8.14:8080 + 1 more...
 
-		Port:              8888-tcp  8888/TCP
+			Port:              8888-tcp  8888/TCP
 
-		TargetPort:        8888/TCP
+			TargetPort:        8888/TCP
 
-		Endpoints:         10.1.10.10:8888,10.1.4.11:8888,10.1.8.14:8888 + 1 more...
+			Endpoints:         10.1.10.10:8888,10.1.4.11:8888,10.1.8.14:8888 + 1 more...
 
-		Session Affinity:  ClientIP
+			Session Affinity:  ClientIP
 
-		Events:            <none>
+			Events:            <none>
 
-	
+******************************************************************************************************************************************************************************************************************************************************************************************************************	
 		
 
 
